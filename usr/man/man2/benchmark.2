@@ -1,0 +1,47 @@
+.TH benchmark "October 17, 2012"
+.UC
+.SH NAME
+benchmark \- test program for the mydriver character device driver
+.SH SYNOPSIS
+.nf
+.ft B
+#include <lib.h>
+#include <stdio.h>
+#include <time.h>
+#include <fcntl.h>
+#include <sys/time.h>
+#include <stdlib.h>
+
+main(void)
+ 
+.ft R
+.fi
+.SH DESCRIPTION
+.de SP
+.if t .sp 0.4
+.if n .sp
+..
+.B main
+will run through four sets of procedure.  Each procedure will determine the time of day first.  It will then begin a for loop set to run X amount of times (in the default case, 10 times).  Within this for loop 
+the program will open a device driver (mydriver, zero, null) or a file (testFile.txt) and then proceed to
+read 25 MB worth of data into the character buffer defined within the program of (1024 * 25600) bytes size.
+
+
+.SP
+The program will then close each file descriptor, get the time of day again, and then print the difference
+in time from start to finish in milliseconds to the screen. 
+
+
+.RE
+.SH "RETURN VALUE
+This program does not return any values.  It only prints to the screen.
+
+
+.SH ERRORS
+.B main
+will fail and crash/return EINVAL if one or more of the
+following are true:
+.TP 15
+One of the drivers are improperly programmed to accept the size of data to be read that is passed to them.
+.SP
+The file descriptor to be opened does not exist.  Will return EINVAL.

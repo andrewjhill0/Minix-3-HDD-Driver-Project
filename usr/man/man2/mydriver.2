@@ -1,0 +1,65 @@
+.TH mydriver "October 17, 2012"
+.UC
+.SH NAME
+mydriver \- hello character driver that streams(reads) data blocks from HDD through a buffer of 1024 bytes
+.SH SYNOPSIS
+.nf
+.ft B
+#include <minix/drivers.h>
+#include <minix/chardriver.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <minix/ds.h>
+#include "hello.h"
+#include <minix/bdev.h>
+#include <minix/u64.h>
+
+pid_t fork(void)
+int hello_open(message *UNUSED(m))
+int hello_close(message *UNUSED(m))
+struct device * hello_prepare(dev_t UNUSED(dev))
+int hello_transfer(endpoint_t endpt, int opcode, u64_t position,
+    iovec_t *iov, unsigned nr_req, endpoint_t UNUSED(user_endpt))
+int sef_cb_lu_state_save(int UNUSED(state))
+int lu_state_restore()
+void sef_local_startup()
+int sef_cb_init(int type, sef_init_info_t *UNUSED(info))
+
+ 
+ 
+.ft R
+.fi
+.SH DESCRIPTION
+.de SP
+.if t .sp 0.4
+.if n .sp
+..
+.B hello_transfer
+will copy data read from the HDD through the bdev library.  The bdev library allow for 
+direct interfacing with the HDD utilizing the at_wini block device controller, which is linked within the
+"main" function of the driver.
+
+.SP
+A FOR LOOP allows for the handling of reading a block of "block_size" bytes from disk (starting at 0) and then copying these back to the user program in a char buffer of the same size.  The loop also makes sure to not
+copy more than it needs to by selecting the minimum of either the remaining bytes to be read and the standard copy size of block_size 
+
+.SP
+NOTE:  At the moment, the block size must be 1024.  Larger block sizes have not been successfully implemented yet due to time limitations and will cause a driver crash.
+
+
+
+.RE
+.SH "RETURN VALUE
+Upon successful completion, \fBhello_transfer\fP returns the value
+of EINVAL by default unless the opcode is equal to DEV_GATHER_S, which tells the function to gather data 
+(ie it should read and copy data).  
+If the function does read and copy the data, it will return the value of the last sys_safecopyto() kernel call in the loop.
+.SH ERRORS
+.B hello_transfer
+will fail and no data will be transfered or read if one or more of the
+following are true:
+.TP 15
+\fBblock_size\fP is greater than 1024.  At the moment, the program will not reliably support a larger size than 
+this for reading blocks from the device.  This requires further testing and bug finding.  
+.SP
+It will also fail if there is insufficient space to be read from (eg the device is smaller than 25 MB).  This is highly unlikely due to most devices being larger than 25 MB.

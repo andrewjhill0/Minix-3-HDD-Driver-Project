@@ -1,0 +1,8 @@
+Project 2 - DRAFT
+COP 4600
+
+Implement a hard disk driver that works as a character device rather than a block device, to bypass the file system's block cache. This allows users to DMA large chunks of data directly into user space, which should improve performance when a program must access large amounts of data.
+Implement a test program that uses tests the performance of access to the hard disk using block- or character-oriented driver, timing how long it takes to read in a specified amount of data. 
+Use the test program to time transfers of various sizes using each kind of driver, as well as the /dev/zero and /dev/null drives. 
+Document the new driver and the test program, as well as your results.
+
